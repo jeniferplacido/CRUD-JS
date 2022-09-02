@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema CRUD</title>
+  <style>
+    input[type='submit'], button, [aria-label]{
+      cursor: pointer;
+    }
+    #spoiler{
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lista de Países na Copa</h1>
+
+<form action="javascript:void(0);" method="POST" onsubmit="app.Add()"> 
+  <input type="text" id="add-name" placeholder="Novo País ">
+  <input type="submit" value="Adicionar">
+</form>
+
+<div id="spoiler" role="aria-hidden">
+  <form action="javascript:void(0);" method="POST" id="saveEdit">
+    <input type="text" id="edit-name">
+    <input type="submit" value="Editar" /> <a onclick="CloseInput()" aria-label="Close">&#10006;</a>
+  </form>
+</div>
+
+<p id="counter"></p>
+
+<table>
+  <tr>
+    <th>NOMES PAÍSES</th>
+  </tr>
+    <tbody id="countries">
+    </tbody>
+</table>
+<!--Desenvolvendo as funções para o crud-->
+<script>
+var app = new function() {
+
+  this.el = document.getElementById('countries');
+
+  this.countries = ['Brasil', 'Alemanha', 'Inglaterra', 'Espanha', 'Itália', 'México', 'Portugal', 'Japão', 'Chile'];
+
+  this.Count = function(data) {
+    var el   = document.getElementById('counter');
+    var name = 'país';
+
+    if (data) {
+      if (data > 1) {
+        name = 'países';
+      }
+      el.innerHTML = data + ' ' + name ;
+    } else {
+      el.innerHTML = 'Nenhum ' + name;
+    }
+  };
+  
+  // Monta a lista de países com as variáveis setadas
+  this.FetchAll = function() {
+    var data = '';
+
+    if (this.countries.length > 0) {
+        //Laço de repetição para correr os registros no array
+      for (i = 0; i < this.countries.length; i++) {
+        data += '<tr>';
+        data += '<td>' + this.countries[i] + '</td>';
+        data += '<td><button onclick="app.Edit(' + i + ')">Edit</button></td>';
+        data += '<td><button onclick="app.Delete(' + i + ')">Delete</button></td>';
+        data += '</tr>';
+      }
+    }
+
+    this.Count(this.countries.length);
+    return this.el.innerHTML = data;
+  };
+
+  this.Add = function () {
+    el = document.getElementById('add-name');
+    //Pega o valor
+    var country = el.value;
+
+    if (country) {
+      // Adiciona o novo valor
+      this.countries.push(country.trim());
+      //Redefinir valor de entrada
+      el.value = '';
+        // Mostra a nova lista
+      this.FetchAll();
+    }
+  };
+
+  this.Edit = function (item) {
+    var el = document.getElementById('edit-name');
+    // Exibe o valor no campo
+    el.value = this.countries[item];
+    // Mostra os campos
+    document.getElementById('spoiler').style.display = 'block';
+    self = this;
+
+    document.getElementById('saveEdit').onsubmit = function() {
+       // Obter valor
+      var country = el.value;
+
+      if (country) {
+          // Edita o valor
+        self.countries.splice(item, 1, country.trim());
+         // Exibe a nova lista
+        self.FetchAll();
+        //Ocultar campos
+        CloseInput();
+      }
+    }
+  };
+
+  this.Delete = function (item) {
+   // Exclui a linha atual
+    this.countries.splice(item, 1);
+    // Exibe a nova lista
+    this.FetchAll();
+  };
+  
+}
+
+app.FetchAll();
+
+function CloseInput() {
+  document.getElementById('spoiler').style.display = 'none';
+}
+</script>
+</body>
+</html>
